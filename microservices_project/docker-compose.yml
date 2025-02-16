@@ -1,0 +1,78 @@
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - notification-service
+      - employee-service
+    networks:
+      - microservices_network
+
+  user-service:
+    build: ./user-service
+    networks:
+      - microservices_network
+
+  product-service:
+    build: ./product-service
+    networks:
+      - microservices_network
+
+  order-service:
+    build: ./order-service
+    networks:
+      - microservices_network
+
+  notification-service:
+    build: ./notification-service
+    networks:
+      - microservices_network
+
+  employee-service:
+    build: ./employee-service
+    networks:
+      - microservices_network
+
+  monitoring:
+    build: ./monitoring
+    ports:
+      - "9090:9090"
+    networks:
+      - microservices_network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - monitoring
+    networks:
+      - microservices_network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14250:14250"
+      - "14268:14268"
+      - "14269:14269"
+      - "9411:9411"
+    networks:
+      - microservices_network
+
+volumes:
+  grafana_data:
+
+networks:
+  microservices_network:
+    driver: bridge
